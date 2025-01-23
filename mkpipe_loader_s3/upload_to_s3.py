@@ -4,7 +4,7 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 
 
 def upload_folder_to_s3(
-    folder_path, bucket_name, s3_prefix='', aws_access_key=None, aws_secret_key=None
+    folder_path, bucket_name, s3_prefix='', table_name='', aws_access_key=None, aws_secret_key=None
 ):
     """
     Upload a folder and its contents to an S3 bucket.
@@ -32,7 +32,7 @@ def upload_folder_to_s3(
                 file_path = os.path.join(root, file)
                 # Construct S3 object key (path)
                 s3_key = os.path.join(
-                    s3_prefix, os.path.relpath(file_path, folder_path)
+                    s3_prefix, table_name, os.path.relpath(file_path, folder_path)
                 ).replace('\\', '/')
 
                 # Upload the file
@@ -58,9 +58,3 @@ def upload_folder_to_s3(
     
     return message
 
-# Example usage
-if __name__ == '__main__':
-    folder = 'path/to/your/folder'  # Local folder path
-    bucket = 'your-s3-bucket-name'  # S3 bucket name
-    s3_folder_prefix = 'uploads/my_folder'  # Optional folder path in S3 bucket
-    upload_folder_to_s3(folder, bucket, s3_prefix=s3_folder_prefix)

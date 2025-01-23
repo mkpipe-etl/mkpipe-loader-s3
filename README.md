@@ -15,12 +15,10 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENS
 ```yaml
 ...
   connections:
-    source:
-      host: 'XXX'
-      port: 'XXX'
-      database: 'XXX'
-      schema: 'XXX' 
-      user: 'XXX'
-      password: 'XXX'
+    destination:
+      bucket_name: xxx 
+      s3_prefix: xxx # optional
+      aws_access_key: "xxx"
+      aws_secret_key: "xxx"
 ...
 ```

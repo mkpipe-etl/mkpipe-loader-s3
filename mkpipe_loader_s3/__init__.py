@@ -80,9 +80,8 @@ class S3Loader:
             logger.info(message)
 
             s3_temp_df_path = str(data['path']+'/s3')
-            df.write.parquet(s3_temp_df_path).mode('overwrite')
-            upload_folder_to_s3(s3_temp_df_path, bucket_name=self.bucket_name, s3_prefix=self.s3_prefix, aws_access_key=self.aws_access_key, aws_secret_key=self.aws_secret_key)
-
+            df.write.parquet(s3_temp_df_path, mode='overwrite')
+            upload_folder_to_s3(s3_temp_df_path, bucket_name=self.bucket_name, s3_prefix=self.s3_prefix, table_name=name, aws_access_key=self.aws_access_key, aws_secret_key=self.aws_secret_key)            
             # Update last point in the mkpipe_manifest table if applicable
             self.backend.manifest_table_update(
                 name=name,
