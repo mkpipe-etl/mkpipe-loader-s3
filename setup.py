@@ -5,7 +5,7 @@ setup(
     version='0.1.1',
     license='Apache License 2.0',
     packages=find_packages(exclude=['tests', 'scripts', 'deploy', 'install_jars.py']),
-    install_requires=['mkpipe','boto3'],
+    install_requires=['mkpipe', 'boto3'],
     include_package_data=True,
     entry_points={
         'mkpipe.loaders': [

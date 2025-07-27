@@ -4,7 +4,12 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 
 
 def upload_folder_to_s3(
-    folder_path, bucket_name, s3_prefix='', table_name='', aws_access_key=None, aws_secret_key=None
+    folder_path,
+    bucket_name,
+    s3_prefix='',
+    table_name='',
+    aws_access_key=None,
+    aws_secret_key=None,
 ):
     """
     Upload a folder and its contents to an S3 bucket.
@@ -39,9 +44,7 @@ def upload_folder_to_s3(
                 s3_client.upload_file(file_path, bucket_name, s3_key)
                 print(f'Uploaded {file_path} to s3://{bucket_name}/{s3_key}')
 
-        
         message = f"All files in '{folder_path}' have been uploaded to bucket '{bucket_name}' under prefix '{s3_prefix}'."
-        
 
     except FileNotFoundError:
         print(f'The folder {folder_path} was not found.')
@@ -55,6 +58,5 @@ def upload_folder_to_s3(
     except Exception as e:
         print(f'An error occurred: {e}')
         raise
-    
-    return message
 
+    return message

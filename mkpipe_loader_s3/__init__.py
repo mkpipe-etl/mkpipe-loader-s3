@@ -9,19 +9,21 @@ from mkpipe.utils import log_container, Logger
 from mkpipe.utils.base_class import PipeSettings
 from .upload_to_s3 import upload_folder_to_s3
 
+
 class S3Loader:
     def __init__(self, config, settings):
         if isinstance(settings, dict):
             self.settings = PipeSettings(**settings)
         else:
             self.settings = settings
+        self.pipeline_name = config.get('pipeline_name', None)
         self.connection_params = config['connection_params']
 
         self.bucket_name = self.connection_params['bucket_name']
         self.s3_prefix = self.connection_params.get('s3_prefix', '')
         self.aws_access_key = self.connection_params.get('aws_access_key', None)
         self.aws_secret_key = self.connection_params.get('aws_secret_key', None)
-        
+
         config_data = load_config()
         connection_params = config_data['settings']['backend']
         db_type = connection_params['database_type']
@@ -52,7 +54,8 @@ class S3Loader:
             if not file_type:
                 'means that the data fetched before no new data'
                 self.backend.manifest_table_update(
-                    name=name,
+                    pipeline_name=self.pipeline_name,
+                    table_name=name,
                     value=None,  # Last point remains unchanged
                     value_type=None,  # Type remains unchanged
                     status='completed',  # ('completed', 'failed', 'extracting', 'loading')
@@ -62,7 +65,8 @@ class S3Loader:
                 return
 
             self.backend.manifest_table_update(
-                name=name,
+                pipeline_name=self.pipeline_name,
+                table_name=name,
                 value=None,  # Last point remains unchanged
                 value_type=None,  # Type remains unchanged
                 status='loading',  # ('completed', 'failed', 'extracting', 'loading')
@@ -79,12 +83,20 @@ class S3Loader:
             )
             logger.info(message)
 
-            s3_temp_df_path = str(data['path']+'/s3')
+            s3_temp_df_path = str(data['path'] + '/s3')
             df.write.parquet(s3_temp_df_path, mode='overwrite')
-            upload_folder_to_s3(s3_temp_df_path, bucket_name=self.bucket_name, s3_prefix=self.s3_prefix, table_name=name, aws_access_key=self.aws_access_key, aws_secret_key=self.aws_secret_key)            
+            upload_folder_to_s3(
+                s3_temp_df_path,
+                bucket_name=self.bucket_name,
+                s3_prefix=self.s3_prefix,
+                table_name=name,
+                aws_access_key=self.aws_access_key,
+                aws_secret_key=self.aws_secret_key,
+            )
             # Update last point in the mkpipe_manifest table if applicable
             self.backend.manifest_table_update(
-                name=name,
+                pipeline_name=self.pipeline_name,
+                table_name=name,
                 value=last_point_value,
                 value_type=iterate_column_type,
                 status='completed',
@@ -114,7 +126,8 @@ class S3Loader:
             )
 
             self.backend.manifest_table_update(
-                name=name,
+                pipeline_name=self.pipeline_name,
+                table_name=name,
                 value=None,  # Last point remains unchanged
                 value_type=None,  # Type remains unchanged
                 status='failed',
